@@ -20,9 +20,11 @@ import {
   ArrowRight,
   Menu,
   X,
+  Droplets,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { useTheme } from "next-themes"
+import { RainEffect, RainController } from "@/components/rain-effects"
 
 export default function Portfolio() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -136,7 +138,10 @@ export default function Portfolio() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-950 dark:to-blue-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-950 dark:to-blue-950 relative overflow-hidden">
+      {/* Rain Effect Background */}
+      <RainEffect type="classic" intensity="light" />
+      
       {/* Navigation */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700">
         <nav className="container mx-auto px-6 py-4">
@@ -161,6 +166,10 @@ export default function Portfolio() {
               </a>
               <a href="#contact" className="nav-item hover:text-purple-600 transition-colors">
                 Contact
+              </a>
+              <a href="/rain-demo" className="nav-item hover:text-cyan-400 transition-colors flex items-center gap-1">
+                <Droplets className="w-4 h-4" />
+                Rain Demo
               </a>
               <ThemeToggle />
             </div>

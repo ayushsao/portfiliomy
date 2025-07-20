@@ -169,5 +169,3 @@ import { YourCustomMesh } from './your-mesh'
 5. **Project Cards**: 3D hover tilt with image scale
 6. **Contact Form**: Floating card with smooth interactions
 7. **Background Elements**: Three.js 3D sphere + floating icons
-
-Your portfolio now has **professional-grade animations** that will impress visitors and showcase your technical skills! 🎉

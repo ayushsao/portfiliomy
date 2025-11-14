@@ -1,5 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  experimental: {
+    optimizeCss: true,
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -8,6 +15,7 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
   },
 }
 

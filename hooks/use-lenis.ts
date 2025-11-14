@@ -10,19 +10,23 @@ export function useLenis() {
       const Lenis = (await import("@studio-freight/lenis")).default
 
       const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smooth: true,
+        lerp: 0.05,
+        smoothWheel: true,
+        smoothTouch: false,
+        wheelMultiplier: 0.5,
+        touchMultiplier: 2,
       })
 
       lenisRef.current = lenis
 
+      let rafId: number
+
       function raf(time: number) {
         lenis.raf(time)
-        requestAnimationFrame(raf)
+        rafId = requestAnimationFrame(raf)
       }
 
-      requestAnimationFrame(raf)
+      rafId = requestAnimationFrame(raf)
 
       // Handle anchor links
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -30,18 +34,27 @@ export function useLenis() {
           e.preventDefault()
           const target = document.querySelector(anchor.getAttribute("href")!)
           if (target) {
-            lenis.scrollTo(target as HTMLElement)
+            lenis.scrollTo(target as HTMLElement, {
+              offset: -80,
+            })
           }
         })
       })
+
+      return () => {
+        if (rafId) {
+          cancelAnimationFrame(rafId)
+        }
+      }
     }
 
-    initLenis()
+    const cleanup = initLenis()
 
     return () => {
       if (lenisRef.current) {
         lenisRef.current.destroy()
       }
+      cleanup?.then(fn => fn?.())
     }
   }, [])
 

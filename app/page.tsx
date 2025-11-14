@@ -20,29 +20,601 @@ import {
   ArrowRight,
   Menu,
   X,
-  Droplets,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { useTheme } from "next-themes"
-import { RainEffect, RainController } from "@/components/rain-effects"
+import { useGSAP } from "@/hooks/use-gsap"
+import { useLenis } from "@/hooks/use-lenis"
 
 export default function Portfolio() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const fullName = "Ayush Kumar"
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  })
+  const [isSending, setIsSending] = useState(false)
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
+  const [isHovering, setIsHovering] = useState(false)
+  
+  const fullName = "Ayush Kumar Sao"
+  const { gsap, ScrollTrigger } = useGSAP()
+  const lenis = useLenis()
+  const heroRef = useRef<HTMLDivElement>(null)
+  const skillsRef = useRef<HTMLDivElement>(null)
+  const projectsRef = useRef<HTMLDivElement>(null)
+  const aboutRef = useRef<HTMLDivElement>(null)
+  const resumeRef = useRef<HTMLDivElement>(null)
+  const contactRef = useRef<HTMLDivElement>(null)
+  const cursorRef = useRef<HTMLDivElement>(null)
+  const cursorDotRef = useRef<HTMLDivElement>(null)
+
+  const skills = [
+    { name: "C++", icon: Code, level: 90 },
+    { name: "JavaScript", icon: Code, level: 90 },
+    { name: "Python", icon: Code, level: 85 },
+    { name: "React.js", icon: Code, level: 90 },
+    { name: "Next.js", icon: Globe, level: 90 },
+    { name: "Node.js", icon: Database, level: 85 },
+    { name: "MongoDB", icon: Database, level: 85 },
+    { name: "Tailwind CSS", icon: Palette, level: 90 },
+  ]
+
+  const projects = [
+    {
+      title: "EssayTute",
+      description: "AI-powered essay evaluator with real-time grammar scoring and analytical feedback. Achieved 95% evaluation accuracy and improved assessment efficiency for users.",
+      image: "/edunova-preview1.png",
+      tags: ["Next.js", "Tailwind CSS", "Firebase"],
+      github: "#",
+      demo: "#",
+    },
+    {
+      title: "Cryptora",
+      description: "Real-time cryptocurrency tracker using CoinGecko API and Chart.js. Optimized Redux state management, reducing chart rendering time by 15%.",
+      image: "/cryptora-preview.jpg",
+      tags: ["React.js", "Redux", "Chart.js"],
+      github: "#",
+      demo: "#",
+    },
+  ]
 
   // Handle hydration and preloader
   useEffect(() => {
     console.log('Portfolio mounted, starting preloader...')
     setMounted(true)
-    // Simulate loading time - increased duration for better visibility
+    // Quick preloader - 1.5 seconds
     const timer = setTimeout(() => {
       console.log('Preloader finished, showing portfolio...')
       setIsLoading(false)
-    }, 4000) // Increased from 2500ms to 4000ms
+    }, 1500) // Reduced from 4000ms to 1500ms
     return () => clearTimeout(timer)
   }, [])
+
+  // Custom cursor effect
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setCursorPosition({ x: e.clientX, y: e.clientY })
+      
+      if (cursorRef.current && cursorDotRef.current) {
+        gsap.to(cursorRef.current, {
+          x: e.clientX,
+          y: e.clientY,
+          duration: 0.3,
+          ease: "power2.out"
+        })
+        
+        gsap.to(cursorDotRef.current, {
+          x: e.clientX,
+          y: e.clientY,
+          duration: 0.1,
+        })
+      }
+    }
+
+    const handleMouseEnter = () => setIsHovering(true)
+    const handleMouseLeave = () => setIsHovering(false)
+
+    // Add cursor effects to interactive elements
+    const interactiveElements = document.querySelectorAll('a, button, input, textarea, [role="button"]')
+    
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', handleMouseEnter)
+      el.addEventListener('mouseleave', handleMouseLeave)
+    })
+
+    window.addEventListener('mousemove', handleMouseMove)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      interactiveElements.forEach(el => {
+        el.removeEventListener('mouseenter', handleMouseEnter)
+        el.removeEventListener('mouseleave', handleMouseLeave)
+      })
+    }
+  }, [gsap, isLoading])
+
+  // GSAP Animations
+  useEffect(() => {
+    if (!gsap || !ScrollTrigger || isLoading) return
+
+    // Sync Lenis with GSAP ScrollTrigger
+    if (lenis) {
+      lenis.on('scroll', ScrollTrigger.update)
+    }
+
+    // Hero section animations
+    gsap.from('.hero-avatar', {
+      scale: 0,
+      rotation: 360,
+      duration: 1,
+      ease: 'back.out(1.7)',
+      delay: 0.2
+    })
+
+    // Continuous floating animation for avatar
+    gsap.to('.hero-avatar', {
+      y: -15,
+      duration: 2,
+      repeat: -1,
+      yoyo: true,
+      ease: 'power1.inOut',
+      delay: 1.5
+    })
+
+    gsap.from('.hero-content h1', {
+      y: 50,
+      opacity: 0,
+      duration: 0.8,
+      delay: 0.5
+    })
+
+    gsap.from('.hero-content h2', {
+      y: 30,
+      opacity: 0,
+      duration: 0.8,
+      delay: 0.7
+    })
+
+    gsap.from('.hero-content p', {
+      y: 30,
+      opacity: 0,
+      duration: 0.8,
+      delay: 0.9
+    })
+
+    gsap.from('.hero-content .flex', {
+      y: 30,
+      opacity: 0,
+      duration: 0.8,
+      delay: 1.1
+    })
+
+    // Floating shapes animation
+    gsap.to('.animate-float-slow', {
+      y: '-=20',
+      x: '-=10',
+      rotation: 5,
+      duration: 3,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    })
+
+    gsap.to('.animate-float-medium', {
+      y: '-=30',
+      x: '+=15',
+      rotation: -8,
+      duration: 2.5,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    })
+
+    gsap.to('.animate-float-fast', {
+      y: '-=40',
+      x: '-=20',
+      rotation: 10,
+      duration: 2,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    })
+
+    // Skills cards animation with ScrollTrigger and floating
+    gsap.utils.toArray('.skill-card').forEach((card: any, index) => {
+      gsap.from(card, {
+        scrollTrigger: {
+          trigger: card,
+          start: 'top bottom-=100',
+          toggleActions: 'play none none reverse'
+        },
+        y: 60,
+        opacity: 0,
+        duration: 0.6,
+        delay: index * 0.1,
+        ease: 'power2.out'
+      })
+
+      // Add continuous floating to skill cards
+      gsap.to(card, {
+        y: -10,
+        duration: 2 + (index % 3) * 0.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.2
+      })
+    })
+
+    // Skill progress bars animation
+    gsap.utils.toArray('.skill-progress').forEach((progress: any) => {
+      const width = progress.style.width
+      gsap.from(progress, {
+        scrollTrigger: {
+          trigger: progress,
+          start: 'top bottom-=100',
+        },
+        width: 0,
+        duration: 1.5,
+        ease: 'power2.out'
+      })
+    })
+
+    // Projects animation with floating
+    gsap.utils.toArray('.project-card').forEach((card: any, index) => {
+      gsap.from(card, {
+        scrollTrigger: {
+          trigger: card,
+          start: 'top bottom-=50',
+          toggleActions: 'play none none reverse'
+        },
+        y: 80,
+        opacity: 0,
+        scale: 0.9,
+        duration: 0.8,
+        delay: index * 0.15,
+        ease: 'power3.out'
+      })
+
+      // Add subtle floating to project cards
+      gsap.to(card, {
+        y: -8,
+        duration: 2.5 + (index % 2) * 0.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: 0.5 + index * 0.1
+      })
+    })
+
+    // About section animation
+    gsap.from('.about-image', {
+      scrollTrigger: {
+        trigger: '.about-image',
+        start: 'top bottom-=100',
+      },
+      x: -100,
+      opacity: 0,
+      duration: 1,
+      ease: 'power2.out'
+    })
+
+    // Floating effect for about image
+    gsap.to('.about-image', {
+      y: -12,
+      duration: 3,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      delay: 1
+    })
+
+    gsap.from('.about-text', {
+      scrollTrigger: {
+        trigger: '.about-text',
+        start: 'top bottom-=100',
+      },
+      x: 100,
+      opacity: 0,
+      duration: 1,
+      ease: 'power2.out'
+    })
+
+    // Section headings animation with floating
+    gsap.utils.toArray('section h2').forEach((heading: any) => {
+      gsap.from(heading, {
+        scrollTrigger: {
+          trigger: heading,
+          start: 'top bottom-=50',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out'
+      })
+
+      // Subtle floating for headings
+      gsap.to(heading, {
+        y: -5,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      })
+    })
+
+    // Navbar slide in
+    gsap.from('header', {
+      y: -100,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power2.out',
+      delay: 0.3
+    })
+
+    // Add floating effect to buttons on hover
+    gsap.utils.toArray('button, .btn, a[href]').forEach((btn: any) => {
+      gsap.to(btn, {
+        y: -3,
+        duration: 1.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        paused: true
+      })
+    })
+
+    // Floating badges
+    gsap.utils.toArray('.badge, [class*="badge"]').forEach((badge: any, index) => {
+      gsap.to(badge, {
+        y: -4,
+        duration: 1.8 + (index % 3) * 0.2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.1
+      })
+    })
+
+    // Floating cards in general
+    gsap.utils.toArray('[class*="Card"], .card').forEach((card: any, index) => {
+      gsap.to(card, {
+        y: -6,
+        duration: 2.2 + (index % 4) * 0.3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.15
+      })
+    })
+
+    // Resume section cards floating
+    gsap.utils.toArray('#resume .card, #resume [class*="Card"]').forEach((card: any, index) => {
+      gsap.to(card, {
+        y: -8,
+        duration: 2.4 + (index % 3) * 0.4,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.2
+      })
+    })
+
+    // Contact section floating
+    gsap.to('#contact .card, #contact [class*="Card"]', {
+      y: -10,
+      duration: 2.6,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      delay: 0.3
+    })
+
+    // Footer elements floating
+    gsap.utils.toArray('footer a, footer .icon, footer svg').forEach((elem: any, index) => {
+      gsap.to(elem, {
+        y: -4,
+        duration: 2 + (index % 5) * 0.3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.08
+      })
+    })
+
+    // Footer sections floating
+    gsap.utils.toArray('footer > div > div, footer .grid > div').forEach((section: any, index) => {
+      gsap.to(section, {
+        y: -6,
+        duration: 2.8 + (index % 2) * 0.4,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.15
+      })
+    })
+
+    // Achievement/certification cards floating
+    gsap.utils.toArray('#resume .grid > div').forEach((achievement: any, index) => {
+      gsap.to(achievement, {
+        y: -7,
+        duration: 2.3 + (index % 4) * 0.3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.12
+      })
+    })
+
+    // Social media icons floating
+    gsap.utils.toArray('.social-icon, a[href*="github"], a[href*="linkedin"], a[href*="twitter"], a[href*="mail"]').forEach((icon: any, index) => {
+      gsap.to(icon, {
+        y: -5,
+        scale: 1.05,
+        duration: 1.8 + (index % 3) * 0.2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.1
+      })
+    })
+
+    // Images floating effect
+    gsap.utils.toArray('img').forEach((img: any, index) => {
+      gsap.to(img, {
+        y: -8,
+        duration: 2.5 + (index % 3) * 0.4,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.1
+      })
+    })
+
+    // Input fields subtle floating
+    gsap.utils.toArray('input, textarea, select').forEach((input: any, index) => {
+      gsap.to(input, {
+        y: -3,
+        duration: 2.2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: index * 0.05
+      })
+    })
+
+    // Separator lines floating
+    gsap.utils.toArray('.separator, hr').forEach((sep: any) => {
+      gsap.to(sep, {
+        y: -2,
+        duration: 3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      })
+    })
+
+  }, [gsap, ScrollTrigger, isLoading])
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSending(true)
+
+    try {
+      // Make the request directly from the browser to avoid Cloudflare blocking
+      const apiKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || '23f5d98e-1db6-41ca-83fe-476733296580'
+      
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: apiKey,
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          subject: `New Portfolio Contact from ${formData.name}`,
+          from_name: 'Portfolio Contact Form',
+          replyto: formData.email
+        })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        alert('✅ Message sent successfully! I will get back to you soon.')
+        setFormData({ name: '', email: '', message: '' })
+      } else {
+        throw new Error(result.message || 'Failed to send')
+      }
+    } catch (error) {
+      console.error('Error sending message:', error)
+      // Fallback to mailto
+      const subject = encodeURIComponent(`Portfolio Contact from ${formData.name}`)
+      const body = encodeURIComponent(
+        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+      )
+      window.location.href = `mailto:ayushsao32@gmail.com?subject=${subject}&body=${body}`
+      
+      setTimeout(() => {
+        alert('✅ Your email client has been opened. Please send the email from there.')
+        setFormData({ name: '', email: '', message: '' })
+      }, 500)
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  // Preloader GSAP animations
+  useEffect(() => {
+    if (!gsap || !isLoading) return
+
+    const tl = gsap.timeline()
+
+    // Animate spinner
+    tl.from('.preloader-spinner', {
+      scale: 0,
+      rotation: -180,
+      duration: 0.8,
+      ease: 'back.out(1.7)'
+    })
+
+    // Animate name letters
+    tl.from('.preloader-letter', {
+      y: 100,
+      opacity: 0,
+      stagger: 0.05,
+      duration: 0.5,
+      ease: 'power3.out'
+    }, '-=0.3')
+
+    // Animate subtitle
+    tl.from('.preloader-subtitle', {
+      y: 30,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power2.out'
+    }, '-=0.2')
+
+    // Animate progress bar container
+    tl.from('.preloader-progress-container', {
+      y: 30,
+      opacity: 0,
+      duration: 0.5,
+      ease: 'power2.out'
+    }, '-=0.3')
+
+    // Animate loading text
+    tl.from('.preloader-loading-text', {
+      y: 20,
+      opacity: 0,
+      duration: 0.5,
+      ease: 'power2.out'
+    }, '-=0.2')
+
+    // Pulse animation for spinner
+    gsap.to('.preloader-spinner-glow', {
+      scale: 1.2,
+      opacity: 0.5,
+      duration: 1,
+      repeat: -1,
+      yoyo: true,
+      ease: 'power1.inOut'
+    })
+
+  }, [gsap, isLoading])
 
   // Don't render until mounted to prevent hydration mismatch
   if (!mounted) {
@@ -57,92 +629,251 @@ export default function Portfolio() {
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 dark:from-slate-950 dark:via-purple-950 dark:to-indigo-950">
+        {/* Animated background particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-white/20 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
+                animationDelay: `${Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
+
         {/* Main preloader content */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center">
-          {/* Simple loading spinner */}
-          <div className="relative mb-12">
+          {/* Enhanced loading spinner */}
+          <div className="relative mb-12 preloader-spinner">
             {/* Outer spinning ring */}
             <div className="w-32 h-32 border-4 border-transparent border-t-purple-500 border-r-pink-500 rounded-full animate-spin"></div>
             {/* Center glowing dot */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse shadow-lg shadow-purple-500/50"></div>
+              <div className="preloader-spinner-glow w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse shadow-lg shadow-purple-500/50"></div>
+            </div>
+            {/* Inner rotating ring */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-20 h-20 border-4 border-transparent border-b-cyan-400 border-l-cyan-400 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
             </div>
           </div>
 
-          {/* Simple name display */}
+          {/* Animated name display */}
           <div className="mb-8">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
-              AYUSH KUMAR
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white flex flex-wrap justify-center gap-1">
+              {"AYUSH KUMAR SAO".split('').map((letter, index) => (
+                <span
+                  key={index}
+                  className="preloader-letter inline-block"
+                  style={{
+                    animation: `wave 2s ease-in-out infinite`,
+                    animationDelay: `${index * 0.1}s`
+                  }}
+                >
+                  {letter === ' ' ? '\u00A0' : letter}
+                </span>
+              ))}
             </h1>
-            <p className="text-xl text-purple-300 animate-pulse">Computer Science Student & MERN Stack Developer</p>
+            <p className="preloader-subtitle text-xl text-purple-300 animate-pulse">Aspiring Software Engineer in C++ and JavaScript (React.js, Next.js)</p>
           </div>
 
-          {/* Simple progress indicator */}
-          <div className="w-80 max-w-sm mx-auto">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-cyan-400 font-semibold">Loading Portfolio...</span>
-              <span className="text-pink-400 font-semibold">Please wait...</span>
+          {/* Enhanced progress indicator */}
+          <div className="preloader-progress-container w-80 max-w-sm mx-auto">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-cyan-400 font-semibold flex items-center gap-2">
+                <span className="inline-block w-2 h-2 bg-cyan-400 rounded-full animate-ping"></span>
+                Loading Portfolio...
+              </span>
+              <span className="text-pink-400 font-semibold animate-pulse">Please wait...</span>
             </div>
-            <div className="w-full h-3 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm">
-              <div className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-full animate-pulse shadow-lg shadow-purple-500/30"></div>
+            <div className="w-full h-3 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm relative">
+              <div className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-full animate-pulse shadow-lg shadow-purple-500/30"
+                   style={{
+                     animation: 'progressBar 4s ease-in-out'
+                   }}></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+            </div>
+            <div className="mt-3 flex justify-between text-xs text-white/50">
+              <span>Initializing...</span>
+              <span className="animate-pulse">Loading assets...</span>
             </div>
           </div>
 
-          {/* Simple loading text */}
-          <div className="mt-8">
-            <p className="text-white/70 animate-pulse">
-              Preparing your experience...
+          {/* Loading text with dots */}
+          <div className="preloader-loading-text mt-8">
+            <p className="text-white/70 flex items-center gap-1">
+              <span>Preparing your experience</span>
+              <span className="inline-flex gap-1">
+                <span className="animate-bounce" style={{ animationDelay: '0s' }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
+              </span>
             </p>
           </div>
         </div>
+
+        <style jsx>{`
+          @keyframes wave {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+          }
+          @keyframes progressBar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+          }
+          @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-20px) translateX(10px); }
+          }
+          .animate-shimmer {
+            animation: shimmer 2s infinite;
+          }
+        `}</style>
       </div>
     )
   }
 
-  const skills = [
-    { name: "JavaScript", icon: Code, level: 90 },
-    { name: "React", icon: Code, level: 85 },
-    { name: "Node.js", icon: Database, level: 80 },
-    { name: "Python", icon: Code, level: 75 },
-    { name: "UI/UX Design", icon: Palette, level: 70 },
-    { name: "MongoDB", icon: Database, level: 80 },
-    { name: "Next.js", icon: Globe, level: 85 },
-    { name: "TypeScript", icon: Code, level: 80 },
-  ]
-
-  const projects = [
-    {
-      title: "Cryptora",
-      description: "A comprehensive cryptocurrency trading platform with real-time market data, portfolio tracking, and secure wallet integration",
-      image: "/cryptora-preview.svg",
-      tags: ["React", "Node.js", "MongoDB", "WebSocket", "Chart.js", "Stripe"],
-      github: "#",
-      demo: "#",
-    },
-    {
-      title: "Edunova",
-      description: "A comprehensive learning management system with interactive courses, real-time collaboration, and progress tracking for modern education",
-      image: "/edunova-preview.svg",
-      tags: ["React", "Node.js", "MongoDB", "Express", "Socket.io", "JWT"],
-      github: "#",
-      demo: "#",
-    },
-    {
-      title: "Weather Dashboard",
-      description: "Beautiful weather app with location-based forecasts",
-      image: "/weather-preview.svg",
-      tags: ["React", "API Integration", "Chart.js"],
-      github: "#",
-      demo: "#",
-    },
-  ]
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-950 dark:to-blue-950 relative overflow-hidden">
-      {/* Rain Effect Background */}
-      <RainEffect type="classic" intensity="light" />
-      
-      {/* Navigation */}
+      {/* Custom Cursor */}
+      <div 
+        ref={cursorRef}
+        className="hidden md:block fixed w-8 h-8 border-2 border-purple-500 dark:border-purple-400 rounded-full pointer-events-none z-[9999] mix-blend-difference"
+        style={{
+          left: '-16px',
+          top: '-16px',
+          transform: isHovering ? 'scale(1.5)' : 'scale(1)',
+          transition: 'transform 0.2s ease-out',
+          opacity: mounted ? 1 : 0
+        }}
+      />
+      <div 
+        ref={cursorDotRef}
+        className="hidden md:block fixed w-1 h-1 bg-purple-500 dark:bg-purple-400 rounded-full pointer-events-none z-[9999] mix-blend-difference"
+        style={{
+          left: '-2px',
+          top: '-2px',
+          opacity: mounted ? 1 : 0
+        }}
+      />
+
+      {/* Floating geometric objects throughout the page */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Top section - Large objects with varied animations */}
+        <div className="absolute top-5 left-5 w-32 h-32 bg-purple-300/20 dark:bg-purple-500/20 rounded-full animate-float-spiral parallax-slow"></div>
+        <div className="absolute top-10 right-10 w-28 h-28 bg-blue-300/20 dark:bg-blue-500/20 rounded-full animate-float-wave parallax-medium"></div>
+        <div className="absolute top-20 left-1/4 w-24 h-24 bg-emerald-300/20 dark:bg-emerald-500/20 rounded-full animate-float-bounce parallax-fast"></div>
+        <div className="absolute top-32 right-1/4 w-20 h-20 bg-pink-300/20 dark:bg-pink-500/20 transform rotate-45 animate-float-zigzag parallax-slow"></div>
+        <div className="absolute top-16 left-1/3 w-26 h-26 bg-indigo-300/20 dark:bg-indigo-500/20 rounded-full animate-float-slow parallax-medium"></div>
+        <div className="absolute top-40 right-1/3 w-22 h-22 bg-cyan-300/20 dark:bg-cyan-500/20 transform rotate-45 animate-float-medium parallax-fast"></div>
+        
+        {/* Upper-left quadrant */}
+        <div className="absolute top-1/6 left-8 w-20 h-20 bg-yellow-300/20 dark:bg-yellow-500/20 rounded-full animate-float-wave parallax-medium"></div>
+        <div className="absolute top-1/5 left-24 w-18 h-18 bg-rose-300/20 dark:bg-rose-500/20 transform rotate-45 animate-float-spiral parallax-slow"></div>
+        <div className="absolute top-1/4 left-12 w-16 h-16 bg-violet-300/20 dark:bg-violet-500/20 rounded-full animate-float-bounce parallax-fast"></div>
+        <div className="absolute top-48 left-32 w-14 h-14 bg-teal-300/20 dark:bg-teal-500/20 transform rotate-45 animate-float-zigzag parallax-medium"></div>
+        
+        {/* Upper-right quadrant */}
+        <div className="absolute top-1/6 right-8 w-24 h-24 bg-orange-300/20 dark:bg-orange-500/20 rounded-full animate-float-fast parallax-slow"></div>
+        <div className="absolute top-1/5 right-24 w-20 h-20 bg-purple-300/20 dark:bg-purple-500/20 transform rotate-45 animate-pulse-glow parallax-medium"></div>
+        <div className="absolute top-1/4 right-16 w-18 h-18 bg-blue-300/20 dark:bg-blue-500/20 rounded-full animate-float-wave parallax-fast"></div>
+        <div className="absolute top-56 right-32 w-16 h-16 bg-emerald-300/20 dark:bg-emerald-500/20 transform rotate-45 animate-float-spiral parallax-slow"></div>
+        
+        {/* Middle-left section */}
+        <div className="absolute top-1/3 left-6 w-28 h-28 bg-pink-300/20 dark:bg-pink-500/20 rounded-full animate-float-spiral parallax-medium"></div>
+        <div className="absolute top-2/5 left-16 w-22 h-22 bg-indigo-300/20 dark:bg-indigo-500/20 transform rotate-45 animate-float-bounce parallax-fast"></div>
+        <div className="absolute top-1/2 left-10 w-20 h-20 bg-cyan-300/20 dark:bg-cyan-500/20 rounded-full animate-float-zigzag parallax-slow"></div>
+        <div className="absolute top-3/5 left-20 w-18 h-18 bg-yellow-300/20 dark:bg-yellow-500/20 transform rotate-45 animate-float-wave parallax-medium"></div>
+        <div className="absolute top-7/12 left-8 w-16 h-16 bg-rose-300/20 dark:bg-rose-500/20 rounded-full animate-pulse-glow parallax-fast"></div>
+        
+        {/* Middle-right section */}
+        <div className="absolute top-1/3 right-6 w-26 h-26 bg-violet-300/20 dark:bg-violet-500/20 rounded-full animate-float-fast parallax-slow"></div>
+        <div className="absolute top-2/5 right-16 w-24 h-24 bg-teal-300/20 dark:bg-teal-500/20 transform rotate-45 animate-float-spiral parallax-medium"></div>
+        <div className="absolute top-1/2 right-12 w-20 h-20 bg-orange-300/20 dark:bg-orange-500/20 rounded-full animate-float-bounce parallax-fast"></div>
+        <div className="absolute top-3/5 right-24 w-18 h-18 bg-purple-300/20 dark:bg-purple-500/20 transform rotate-45 animate-float-wave parallax-slow"></div>
+        <div className="absolute top-7/12 right-8 w-16 h-16 bg-blue-300/20 dark:bg-blue-500/20 rounded-full animate-float-zigzag parallax-medium"></div>
+        
+        {/* Center area */}
+        <div className="absolute top-1/2 left-1/2 w-14 h-14 bg-emerald-300/20 dark:bg-emerald-500/20 rounded-full animate-pulse-glow parallax-fast"></div>
+        <div className="absolute top-2/3 left-1/3 w-18 h-18 bg-pink-300/20 dark:bg-pink-500/20 transform rotate-45 animate-float-spiral parallax-slow"></div>
+        <div className="absolute top-1/2 left-2/5 w-16 h-16 bg-indigo-300/20 dark:bg-indigo-500/20 rounded-full animate-float-wave parallax-medium"></div>
+        <div className="absolute top-3/5 left-3/5 w-20 h-20 bg-cyan-300/20 dark:bg-cyan-500/20 transform rotate-45 animate-float-bounce parallax-fast"></div>
+        <div className="absolute top-5/12 right-2/5 w-12 h-12 bg-yellow-300/20 dark:bg-yellow-500/20 rounded-full animate-float-zigzag parallax-slow"></div>
+        
+        {/* Lower-left quadrant */}
+        <div className="absolute bottom-1/4 left-10 w-28 h-28 bg-rose-300/20 dark:bg-rose-500/20 rounded-full animate-float-wave parallax-medium"></div>
+        <div className="absolute bottom-1/3 left-24 w-24 h-24 bg-violet-300/20 dark:bg-violet-500/20 transform rotate-45 animate-float-spiral parallax-fast"></div>
+        <div className="absolute bottom-2/5 left-16 w-20 h-20 bg-teal-300/20 dark:bg-teal-500/20 rounded-full animate-float-bounce parallax-slow"></div>
+        <div className="absolute bottom-1/5 left-32 w-18 h-18 bg-orange-300/20 dark:bg-orange-500/20 transform rotate-45 animate-float-zigzag parallax-medium"></div>
+        <div className="absolute bottom-1/6 left-8 w-16 h-16 bg-purple-300/20 dark:bg-purple-500/20 rounded-full animate-pulse-glow parallax-fast"></div>
+        
+        {/* Lower-right quadrant */}
+        <div className="absolute bottom-1/4 right-12 w-26 h-26 bg-blue-300/20 dark:bg-blue-500/20 rounded-full animate-float-spiral parallax-slow"></div>
+        <div className="absolute bottom-1/3 right-28 w-22 h-22 bg-emerald-300/20 dark:bg-emerald-500/20 transform rotate-45 animate-float-wave parallax-medium"></div>
+        <div className="absolute bottom-2/5 right-16 w-20 h-20 bg-pink-300/20 dark:bg-pink-500/20 rounded-full animate-float-bounce parallax-fast"></div>
+        <div className="absolute bottom-1/5 right-32 w-18 h-18 bg-indigo-300/20 dark:bg-indigo-500/20 transform rotate-45 animate-pulse-glow parallax-slow"></div>
+        <div className="absolute bottom-1/6 right-10 w-16 h-16 bg-cyan-300/20 dark:bg-cyan-500/20 rounded-full animate-float-zigzag parallax-medium"></div>
+        
+        {/* Bottom section */}
+        <div className="absolute bottom-10 left-1/4 w-24 h-24 bg-yellow-300/20 dark:bg-yellow-500/20 rounded-full animate-float-wave parallax-fast"></div>
+        <div className="absolute bottom-16 right-1/4 w-20 h-20 bg-rose-300/20 dark:bg-rose-500/20 transform rotate-45 animate-float-spiral parallax-slow"></div>
+        <div className="absolute bottom-8 left-1/3 w-18 h-18 bg-violet-300/20 dark:bg-violet-500/20 rounded-full animate-float-bounce parallax-medium"></div>
+        <div className="absolute bottom-12 right-1/3 w-22 h-22 bg-teal-300/20 dark:bg-teal-500/20 transform rotate-45 animate-float-zigzag parallax-fast"></div>
+        <div className="absolute bottom-20 left-2/5 w-16 h-16 bg-orange-300/20 dark:bg-orange-500/20 rounded-full animate-pulse-glow parallax-slow"></div>
+        <div className="absolute bottom-24 right-2/5 w-14 h-14 bg-purple-300/20 dark:bg-purple-500/20 transform rotate-45 animate-float-wave parallax-medium"></div>
+        
+        {/* Scattered throughout - Mix of sizes */}
+        <div className="absolute top-2/3 left-1/5 w-14 h-14 bg-blue-300/20 dark:bg-blue-500/20 rounded-full animate-float-spiral parallax-fast"></div>
+        <div className="absolute top-3/4 left-1/6 w-16 h-16 bg-emerald-300/20 dark:bg-emerald-500/20 transform rotate-45 animate-float-wave parallax-slow"></div>
+        <div className="absolute top-1/5 right-1/5 w-18 h-18 bg-pink-300/20 dark:bg-pink-500/20 rounded-full animate-float-bounce parallax-medium"></div>
+        <div className="absolute top-1/8 right-1/6 w-12 h-12 bg-indigo-300/20 dark:bg-indigo-500/20 transform rotate-45 animate-float-zigzag parallax-fast"></div>
+        <div className="absolute top-3/5 left-2/3 w-20 h-20 bg-cyan-300/20 dark:bg-cyan-500/20 rounded-full animate-pulse-glow parallax-slow"></div>
+        <div className="absolute top-4/5 right-1/4 w-22 h-22 bg-yellow-300/20 dark:bg-yellow-500/20 transform rotate-45 animate-float-spiral parallax-medium"></div>
+        <div className="absolute top-5/6 left-3/4 w-16 h-16 bg-rose-300/20 dark:bg-rose-500/20 rounded-full animate-float-wave parallax-fast"></div>
+        <div className="absolute bottom-3/5 left-1/8 w-18 h-18 bg-violet-300/20 dark:bg-violet-500/20 transform rotate-45 animate-float-bounce parallax-slow"></div>
+        <div className="absolute bottom-4/5 right-1/8 w-14 h-14 bg-teal-300/20 dark:bg-teal-500/20 rounded-full animate-float-zigzag parallax-medium"></div>
+        
+        {/* Triangles scattered */}
+        <div className="absolute top-64 left-1/4 w-0 h-0 border-l-10 border-r-10 border-b-20 border-l-transparent border-r-transparent border-b-purple-300/30 dark:border-b-purple-500/30 animate-float-spiral parallax-fast"></div>
+        <div className="absolute top-80 right-1/4 w-0 h-0 border-l-8 border-r-8 border-b-16 border-l-transparent border-r-transparent border-b-blue-300/30 dark:border-b-blue-500/30 animate-float-bounce parallax-slow"></div>
+        <div className="absolute top-96 left-1/3 w-0 h-0 border-l-12 border-r-12 border-b-24 border-l-transparent border-r-transparent border-b-emerald-300/30 dark:border-b-emerald-500/30 animate-float-wave parallax-medium"></div>
+        <div className="absolute bottom-64 right-1/3 w-0 h-0 border-l-10 border-r-10 border-b-20 border-l-transparent border-r-transparent border-b-pink-300/30 dark:border-b-pink-500/30 animate-float-zigzag parallax-fast"></div>
+        <div className="absolute bottom-80 left-2/5 w-0 h-0 border-l-8 border-r-8 border-b-16 border-l-transparent border-r-transparent border-b-indigo-300/30 dark:border-b-indigo-500/30 animate-pulse-glow parallax-slow"></div>
+        <div className="absolute top-1/3 left-1/5 w-0 h-0 border-l-6 border-r-6 border-b-12 border-l-transparent border-r-transparent border-b-cyan-300/30 dark:border-b-cyan-500/30 animate-float-spiral parallax-medium"></div>
+        <div className="absolute top-2/3 right-1/5 w-0 h-0 border-l-10 border-r-10 border-b-20 border-l-transparent border-r-transparent border-b-yellow-300/30 dark:border-b-yellow-500/30 animate-float-wave parallax-fast"></div>
+        <div className="absolute bottom-1/3 left-1/2 w-0 h-0 border-l-12 border-r-12 border-b-24 border-l-transparent border-r-transparent border-b-rose-300/30 dark:border-b-rose-500/30 animate-float-bounce parallax-slow"></div>
+        
+        {/* Small accent dots - Extra layer */}
+        <div className="absolute top-1/12 left-1/12 w-4 h-4 bg-purple-400/40 dark:bg-purple-500/40 rounded-full animate-pulse-glow parallax-medium"></div>
+        <div className="absolute top-2/12 left-2/12 w-3 h-3 bg-blue-400/40 dark:bg-blue-500/40 rounded-full animate-float-spiral parallax-fast"></div>
+        <div className="absolute top-1/6 left-1/6 w-5 h-5 bg-emerald-400/40 dark:bg-emerald-500/40 rounded-full animate-float-wave parallax-slow"></div>
+        <div className="absolute top-1/4 left-1/8 w-4 h-4 bg-pink-400/40 dark:bg-pink-500/40 rounded-full animate-float-bounce parallax-medium"></div>
+        <div className="absolute top-1/3 left-1/12 w-3 h-3 bg-indigo-400/40 dark:bg-indigo-500/40 rounded-full animate-float-zigzag parallax-fast"></div>
+        <div className="absolute bottom-1/6 left-1/4 w-5 h-5 bg-cyan-400/40 dark:bg-cyan-500/40 rounded-full animate-pulse-glow parallax-slow"></div>
+        <div className="absolute bottom-1/12 left-1/6 w-4 h-4 bg-yellow-400/40 dark:bg-yellow-500/40 rounded-full animate-float-spiral parallax-medium"></div>
+        <div className="absolute bottom-2/12 left-1/8 w-3 h-3 bg-rose-400/40 dark:bg-rose-500/40 rounded-full animate-float-wave parallax-fast"></div>
+        <div className="absolute top-3/4 right-1/3 w-5 h-5 bg-violet-400/40 dark:bg-violet-500/40 rounded-full animate-float-bounce parallax-slow"></div>
+        <div className="absolute top-5/6 right-1/4 w-4 h-4 bg-teal-400/40 dark:bg-teal-500/40 rounded-full animate-float-zigzag parallax-medium"></div>
+        <div className="absolute top-1/8 right-1/6 w-3 h-3 bg-orange-400/40 dark:bg-orange-500/40 rounded-full animate-pulse-glow parallax-fast"></div>
+        <div className="absolute top-1/12 right-1/12 w-5 h-5 bg-purple-400/40 dark:bg-purple-500/40 rounded-full animate-float-spiral parallax-slow"></div>
+        <div className="absolute bottom-1/8 right-2/3 w-4 h-4 bg-blue-400/40 dark:blue-500/40 rounded-full animate-float-wave parallax-medium"></div>
+        <div className="absolute bottom-1/6 right-1/5 w-3 h-3 bg-emerald-400/40 dark:bg-emerald-500/40 rounded-full animate-float-bounce parallax-fast"></div>
+        <div className="absolute bottom-1/4 right-1/6 w-5 h-5 bg-pink-400/40 dark:bg-pink-500/40 rounded-full animate-float-zigzag parallax-slow"></div>
+        
+        {/* Horizontal lines */}
+        <div className="absolute top-1/5 left-1/6 w-24 h-2 bg-gradient-to-r from-purple-300/30 to-transparent dark:from-purple-500/30 rounded-full animate-float-wave parallax-medium"></div>
+        <div className="absolute top-2/5 right-1/6 w-28 h-2 bg-gradient-to-l from-blue-300/30 to-transparent dark:from-blue-500/30 rounded-full animate-float-spiral parallax-fast"></div>
+        <div className="absolute bottom-1/4 left-1/5 w-20 h-1 bg-gradient-to-r from-emerald-300/30 to-transparent dark:from-emerald-500/30 rounded-full animate-float-bounce parallax-slow"></div>
+        <div className="absolute bottom-2/5 right-1/5 w-26 h-1 bg-gradient-to-l from-pink-300/30 to-transparent dark:from-pink-500/30 rounded-full animate-float-zigzag parallax-medium"></div>
+      </div>
+
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700">
         <nav className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -166,10 +897,6 @@ export default function Portfolio() {
               </a>
               <a href="#contact" className="nav-item hover:text-purple-600 transition-colors">
                 Contact
-              </a>
-              <a href="/rain-demo" className="nav-item hover:text-cyan-400 transition-colors flex items-center gap-1">
-                <Droplets className="w-4 h-4" />
-                Rain Demo
               </a>
               <ThemeToggle />
             </div>
@@ -214,37 +941,7 @@ export default function Portfolio() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 relative overflow-hidden">
-        {/* Moving Background Objects */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Floating circles */}
-          <div className="absolute top-20 left-10 w-20 h-20 bg-purple-300/20 rounded-full animate-float-slow"></div>
-          <div className="absolute top-40 right-20 w-16 h-16 bg-blue-300/20 rounded-full animate-float-medium"></div>
-          <div className="absolute bottom-40 left-20 w-24 h-24 bg-emerald-300/20 rounded-full animate-float-fast"></div>
-          <div className="absolute bottom-20 right-40 w-12 h-12 bg-pink-300/20 rounded-full animate-float-slow"></div>
-          <div className="absolute top-1/2 left-5 w-14 h-14 bg-yellow-300/20 rounded-full animate-float-medium"></div>
-          <div className="absolute top-1/3 right-10 w-18 h-18 bg-indigo-300/20 rounded-full animate-float-fast"></div>
-          
-          {/* Floating triangles */}
-          <div className="absolute top-60 left-1/4 w-0 h-0 border-l-8 border-r-8 border-b-16 border-l-transparent border-r-transparent border-b-purple-300/30 animate-float-medium"></div>
-          <div className="absolute top-80 right-1/4 w-0 h-0 border-l-6 border-r-6 border-b-12 border-l-transparent border-r-transparent border-b-blue-300/30 animate-float-fast"></div>
-          <div className="absolute bottom-1/3 left-1/2 w-0 h-0 border-l-10 border-r-10 border-b-20 border-l-transparent border-r-transparent border-b-emerald-300/20 animate-float-slow"></div>
-          
-          {/* Floating squares */}
-          <div className="absolute top-32 right-1/3 w-8 h-8 bg-gradient-to-br from-purple-300/20 to-blue-300/20 transform rotate-45 animate-float-slow"></div>
-          <div className="absolute bottom-60 left-1/3 w-6 h-6 bg-gradient-to-br from-emerald-300/20 to-pink-300/20 transform rotate-45 animate-float-medium"></div>
-          <div className="absolute top-2/3 right-1/5 w-10 h-10 bg-gradient-to-br from-yellow-300/20 to-red-300/20 transform rotate-45 animate-float-fast"></div>
-          
-          {/* Floating lines/rectangles */}
-          <div className="absolute top-1/4 left-1/5 w-16 h-2 bg-gradient-to-r from-purple-300/30 to-transparent rounded-full animate-float-medium"></div>
-          <div className="absolute bottom-1/4 right-1/5 w-20 h-1 bg-gradient-to-l from-blue-300/30 to-transparent rounded-full animate-float-slow"></div>
-          
-          {/* Additional decorative elements */}
-          <div className="absolute top-16 left-1/2 w-3 h-3 bg-cyan-300/40 rounded-full animate-float-fast"></div>
-          <div className="absolute bottom-16 left-1/4 w-4 h-4 bg-rose-300/40 rounded-full animate-float-medium"></div>
-          <div className="absolute top-3/4 right-1/3 w-5 h-5 bg-violet-300/40 rounded-full animate-float-slow"></div>
-        </div>
-
+      <section ref={heroRef} className="pt-32 pb-20 px-6 relative overflow-hidden">
         <div className="container mx-auto text-center relative z-10">
           <div className="hero-content max-w-4xl mx-auto">
             <div className="hero-avatar w-32 h-32 mx-auto mb-8 rounded-full overflow-hidden border-4 border-white dark:border-slate-700 shadow-xl">
@@ -254,58 +951,14 @@ export default function Portfolio() {
                 className="w-full h-full object-cover"
               />
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 min-h-[1.2em]">
-              <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-                {fullName.split(' ').map((word, wordIndex) => (
-                  <div key={wordIndex} className="flex">
-                    {word.split('').map((letter, letterIndex) => {
-                      const totalIndex = fullName.slice(0, fullName.indexOf(word) + letterIndex).length
-                      const colors = [
-                        'text-purple-600',
-                        'text-blue-600', 
-                        'text-emerald-600',
-                        'text-pink-600',
-                        'text-indigo-600',
-                        'text-cyan-600',
-                        'text-violet-600',
-                        'text-teal-600',
-                        'text-rose-600',
-                        'text-orange-600',
-                        'text-yellow-600',
-                        'text-lime-600',
-                        'text-sky-600',
-                        'text-fuchsia-600',
-                        'text-amber-600'
-                      ]
-                      return (
-                        <span
-                          key={letterIndex}
-                          className={`inline-block animate-wave-letter ${colors[totalIndex % colors.length]} hover:scale-125 transition-transform cursor-pointer font-extrabold`}
-                          style={{
-                            animationDelay: `${totalIndex * 0.15}s`,
-                            transformOrigin: 'center bottom',
-                            animationDuration: '2.5s'
-                          }}
-                        >
-                          {letter}
-                        </span>
-                      )
-                    })}
-                    {wordIndex < fullName.split(' ').length - 1 && (
-                      <span className="inline-block w-2 sm:w-4 animate-wave-letter" 
-                            style={{animationDelay: `${fullName.indexOf(' ', fullName.indexOf(word)) * 0.15}s`}}>
-                        &nbsp;
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+              {fullName}
             </h1>
-            <h2 className="text-2xl md:text-3xl text-slate-600 dark:text-slate-300 mb-8">
-              Computer Science Student & MERN Stack Developer
-            </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto">
-              Hi, I'm Ayush Kumar 👋 I'm a final-year Computer Science student, passionate about building robust web applications and solving complex algorithmic problems. As a MERN stack developer, I craft full-stack projects with clean, scalable code.
+            <p className="text-xl md:text-2xl text-slate-700 dark:text-slate-300 mb-8 font-medium">
+              Software Developer | C++ • JavaScript • React
+            </p>
+            <p className="text-base md:text-lg text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+              Building scalable web applications and solving complex problems. Top 0.4% on LeetCode with a 500-day streak. Currently seeking opportunities in product engineering.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
@@ -341,21 +994,20 @@ export default function Portfolio() {
               <div className="relative">
                 <img
                   src="/placeholder.jpg"
-                  alt="About me"
-                  className="rounded-2xl shadow-2xl"
+                  alt="About"
+                  className="rounded-lg shadow-lg"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/20 to-blue-600/20 rounded-2xl"></div>
               </div>
             </div>
             <div className="about-text">
-              <h2 className="text-4xl font-bold mb-6 text-slate-800 dark:text-white">
-                About Me
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900 dark:text-white">
+                About
               </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">
-                I'm a final-year Computer Science student, passionate about building robust web applications and solving complex algorithmic problems. As a MERN stack developer, I craft full-stack projects with clean, scalable code. I'm also a dedicated competitive programmer, constantly sharpening my problem-solving skills on platforms like LeetCode and GeeksforGeeks.
+              <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+                CS student at Technocrats Institute of Technology, Bhopal. I build web apps with React, Next.js, and Tailwind, and I'm pretty good with C++ and algorithms.
               </p>
-              <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
-                I love transforming ideas into real-world applications, and I'm always exploring new technologies and challenges to grow as a developer. Let's build something great together!
+              <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
+                Top 0.4% on LeetCode (500-day streak, 1000+ problems solved). Did a frontend internship at Vault Of Code where I worked on UI implementation and code optimization.
               </p>
               <div className="flex flex-wrap gap-4">
                 <div className="flex items-center gap-2">
@@ -431,36 +1083,54 @@ export default function Portfolio() {
                 <Card className="p-6">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="text-xl font-semibold text-slate-800 dark:text-white">
-                      Bachelor of Technology - Computer Science
+                      B.Tech in Computer Science
                     </h4>
-                    <Badge variant="secondary">2022-2026</Badge>
+                    <Badge variant="secondary">Oct 2022 - June 2026</Badge>
                   </div>
                   <p className="text-purple-600 dark:text-purple-400 font-medium mb-2">
-                    RGPV University
+                    Technocrats Institute Of Technology, Bhopal
                   </p>
                   <p className="text-slate-600 dark:text-slate-400">
-                    Currently pursuing B.Tech in Computer Science Engineering with focus on Data Structures, Algorithms, Web Development, and Software Engineering.
+                    Currently pursuing B.Tech in Computer Science Engineering with focus on Object-Oriented Programming, DBMS, Operating Systems, and Computer Networks.
                   </p>
                   <div className="mt-3">
-                    <Badge variant="outline">CGPA: 7.35/10</Badge>
+                    <Badge variant="outline">CGPA: 7.54</Badge>
                   </div>
                 </Card>
 
                 <Card className="p-6">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="text-xl font-semibold text-slate-800 dark:text-white">
-                      Higher Secondary Education
+                      Class XII - CBSE
                     </h4>
-                    <Badge variant="secondary">2020-2022</Badge>
+                    <Badge variant="secondary">April 2021</Badge>
                   </div>
                   <p className="text-purple-600 dark:text-purple-400 font-medium mb-2">
-                    Science Stream (PCM + Computer Science)
+                    DAV Public School, Chaibasa
                   </p>
                   <p className="text-slate-600 dark:text-slate-400">
-                    Completed 12th grade with Mathematics, Physics, Chemistry, and Computer Science.
+                    Completed higher secondary education with focus on Science stream.
                   </p>
                   <div className="mt-3">
                     <Badge variant="outline">Percentage: 84%</Badge>
+                  </div>
+                </Card>
+
+                <Card className="p-6">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="text-xl font-semibold text-slate-800 dark:text-white">
+                      Class X - CBSE
+                    </h4>
+                    <Badge variant="secondary">March 2019</Badge>
+                  </div>
+                  <p className="text-purple-600 dark:text-purple-400 font-medium mb-2">
+                    DAV Public School, Chaibasa
+                  </p>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Completed secondary education with strong academic performance.
+                  </p>
+                  <div className="mt-3">
+                    <Badge variant="outline">Percentage: 87.2%</Badge>
                   </div>
                 </Card>
               </div>
@@ -476,21 +1146,23 @@ export default function Portfolio() {
                 <Card className="p-6">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="text-xl font-semibold text-slate-800 dark:text-white">
-                      MERN Stack Developer
+                      Frontend Developer Intern
                     </h4>
-                    <Badge variant="secondary">2023-Present</Badge>
+                    <Badge variant="secondary">June 2025 - Aug 2025</Badge>
                   </div>
                   <p className="text-emerald-600 dark:text-emerald-400 font-medium mb-2">
-                    Personal Projects & Freelance
+                    Vault Of Code, Remote
                   </p>
-                  <p className="text-slate-600 dark:text-slate-400 mb-3">
-                    Developing full-stack web applications using MongoDB, Express.js, React.js, and Node.js. Created multiple projects including cryptocurrency trading platform and learning management system.
-                  </p>
+                  <ul className="text-slate-600 dark:text-slate-400 mb-3 space-y-2 list-disc list-inside">
+                    <li>Translated UI/UX designs into clean, responsive, and efficient code using HTML, CSS, JavaScript, and React</li>
+                    <li>Collaborated closely with design and backend teams to ensure smooth integration and consistent user experience</li>
+                    <li>Participated in code reviews and optimized frontend performance for faster load times and better usability</li>
+                  </ul>
                   <div className="flex flex-wrap gap-2">
-                    <Badge>React.js</Badge>
-                    <Badge>Node.js</Badge>
-                    <Badge>MongoDB</Badge>
-                    <Badge>Express.js</Badge>
+                    <Badge>HTML</Badge>
+                    <Badge>CSS</Badge>
+                    <Badge>JavaScript</Badge>
+                    <Badge>React</Badge>
                   </div>
                 </Card>
 
@@ -502,14 +1174,15 @@ export default function Portfolio() {
                     <Badge variant="secondary">2022-Present</Badge>
                   </div>
                   <p className="text-emerald-600 dark:text-emerald-400 font-medium mb-2">
-                    LeetCode & GeeksforGeeks
+                    LeetCode, CodeChef & GeeksforGeeks
                   </p>
                   <p className="text-slate-600 dark:text-slate-400 mb-3">
-                    Active problem solver with focus on Data Structures and Algorithms. Solved 1000+ problems across various platforms.
+                    Ranked 340th globally in LeetCode Weekly Contest (50,000+ participants). Maintained a 500-day LeetCode streak, solving 1000+ problems. Global Rank 565 on CodeChef, 2-Star Coder (Max Rating 1490).
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Badge>Data Structures</Badge>
                     <Badge>Algorithms</Badge>
+                    <Badge>C++</Badge>
                     <Badge>Problem Solving</Badge>
                   </div>
                 </Card>
@@ -525,26 +1198,26 @@ export default function Portfolio() {
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="p-6 text-center">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Code className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Code className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
                 <h4 className="font-semibold text-slate-800 dark:text-white mb-2">
-                  MERN Stack Development
+                  LeetCode Top 0.4% Globally
                 </h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Self-taught full-stack development with practical project implementation
+                  Ranked 340th globally in LeetCode Weekly Contest with 50,000+ participants
                 </p>
               </Card>
 
               <Card className="p-6 text-center">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Database className="w-6 h-6 text-green-600 dark:text-green-400" />
+                <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Database className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                 </div>
                 <h4 className="font-semibold text-slate-800 dark:text-white mb-2">
-                  Database Management
+                  500-Day LeetCode Streak
                 </h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  MongoDB, MySQL, and database design expertise
+                  Maintained a 500-day LeetCode streak, solving 1000+ problems
                 </p>
               </Card>
 
@@ -553,10 +1226,46 @@ export default function Portfolio() {
                   <Globe className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <h4 className="font-semibold text-slate-800 dark:text-white mb-2">
-                  Web Development
+                  CodeChef 2-Star Coder
                 </h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Modern web technologies and responsive design principles
+                  Global Rank 565 on CodeChef with Max Rating 1490
+                </p>
+              </Card>
+
+              <Card className="p-6 text-center">
+                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Code className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h4 className="font-semibold text-slate-800 dark:text-white mb-2">
+                  AWS Cloud Practitioner Certified
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Basics of AWS services and security
+                </p>
+              </Card>
+
+              <Card className="p-6 text-center">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Database className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h4 className="font-semibold text-slate-800 dark:text-white mb-2">
+                  GitHub Foundations
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Core Git and GitHub workflows certified
+                </p>
+              </Card>
+
+              <Card className="p-6 text-center">
+                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Globe className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <h4 className="font-semibold text-slate-800 dark:text-white mb-2">
+                  DevFest Bhopal 2024
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Attended by GDG; explored Web, Cloud, and Mobile technologies
                 </p>
               </Card>
             </div>
@@ -596,7 +1305,7 @@ export default function Portfolio() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
+              <Card key={index} className="project-card group hover:shadow-xl transition-all duration-300 overflow-hidden">
                 <div className="relative overflow-hidden">
                   <img
                     src={project.image}
@@ -637,12 +1346,12 @@ export default function Portfolio() {
       {/* Contact Section */}
       <section id="contact" className="py-20 px-6 bg-white/50 dark:bg-slate-900/50">
         <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-slate-800 dark:text-white">
-              Let's Work Together
+          <div className="mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-slate-900 dark:text-white">
+              Get in Touch
             </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Have a project in mind? I'd love to hear about it and discuss how we can bring your ideas to life.
+            <p className="text-slate-600 dark:text-slate-400 max-w-2xl">
+              Feel free to reach out for opportunities or just to chat
             </p>
           </div>
           <div className="max-w-2xl mx-auto">
@@ -711,10 +1420,49 @@ export default function Portfolio() {
                     <h3 className="text-xl font-semibold mb-4 text-slate-800 dark:text-white">
                       Send a Message
                     </h3>
-                    <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                      <Mail className="mr-2 h-4 w-4" />
-                      Send Email
-                    </Button>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <input
+                          type="text"
+                          name="name"
+                          placeholder="Your Name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-2 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="email"
+                          name="email"
+                          placeholder="Your Email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-2 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <textarea
+                          name="message"
+                          placeholder="Your Message"
+                          value={formData.message}
+                          onChange={handleInputChange}
+                          required
+                          rows={4}
+                          className="w-full px-4 py-2 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                        />
+                      </div>
+                      <Button 
+                        type="submit" 
+                        disabled={isSending}
+                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50"
+                      >
+                        <Mail className="mr-2 h-4 w-4" />
+                        {isSending ? 'Sending...' : 'Send Email'}
+                      </Button>
+                    </form>
                   </div>
                 </div>
               </CardContent>
@@ -734,7 +1482,7 @@ export default function Portfolio() {
                 Ayush Kumar
               </h3>
               <p className="text-slate-300 mb-4 leading-relaxed">
-                Final-year Computer Science student & MERN stack developer passionate about building robust web applications and solving complex algorithmic problems. I love transforming ideas into real-world applications through clean, scalable code.
+                Aspiring software engineer skilled in C++ and JavaScript (React.js, Next.js), ranked in the Top 0.4% on LeetCode. B.Tech Computer Science student passionate about building robust web applications and solving complex algorithmic problems.
               </p>
               <div className="flex gap-4">
                 <a 

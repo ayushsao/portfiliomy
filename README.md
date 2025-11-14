@@ -29,15 +29,7 @@ npm run build
 npm start
 ```
 
-## 🌐 Deployment
 
-### Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Import project on [Vercel](https://vercel.com)
-3. Add environment variable:
-   - `NEXT_PUBLIC_WEB3FORMS_KEY`: Your Web3Forms API key
-4. Deploy!
 
 ### Other Platforms
 
@@ -48,13 +40,6 @@ The site is a standard Next.js app and can be deployed to:
 - Render
 - Any Node.js hosting
 
-## 🔑 Environment Variables
-
-Create a `.env.local` file with:
-
-```env
-NEXT_PUBLIC_WEB3FORMS_KEY=your_web3forms_api_key
-```
 
 ## 🛠️ Technologies
 

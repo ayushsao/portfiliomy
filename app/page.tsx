@@ -38,6 +38,7 @@ export default function Portfolio() {
   const [isSending, setIsSending] = useState(false)
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
   const [isHovering, setIsHovering] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   
   const fullName = "Ayush Kumar Sao"
   const { gsap, ScrollTrigger } = useGSAP()
@@ -48,6 +49,14 @@ export default function Portfolio() {
   const aboutRef = useRef<HTMLDivElement>(null)
   const resumeRef = useRef<HTMLDivElement>(null)
   const contactRef = useRef<HTMLDivElement>(null)
+
+  // Play click sound
+  const playClickSound = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0
+      audioRef.current.play().catch(() => {})
+    }
+  }
   const cursorRef = useRef<HTMLDivElement>(null)
   const cursorDotRef = useRef<HTMLDivElement>(null)
 
@@ -85,6 +94,9 @@ export default function Portfolio() {
   useEffect(() => {
     console.log('Portfolio mounted, starting preloader...')
     setMounted(true)
+    // Initialize audio
+    audioRef.current = new Audio('data:audio/wav;base64,UklGRhgBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YfQAAAAAAAEAAgADAAQABQAGAAcACAAJAAoACwAMAA0ADgAPABAAEQASABMAFAAVABYAFwAYABkAGgAbABwAHQAeAB8AIAAhACIAIwAkACUAJgAnACgAKQAqACsALAAtAC4ALwAwADEAMgAzADQANQA2ADcAOAA5ADo=')
+    audioRef.current.volume = 0.3
     // Quick preloader - 1.5 seconds
     const timer = setTimeout(() => {
       console.log('Preloader finished, showing portfolio...')
@@ -93,12 +105,17 @@ export default function Portfolio() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Custom cursor effect
+  // Custom cursor effect (desktop only)
   useEffect(() => {
+    // Check if device is mobile/tablet
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768
+    
+    if (isMobile) return // Skip cursor on mobile
+
     const handleMouseMove = (e: MouseEvent) => {
       setCursorPosition({ x: e.clientX, y: e.clientY })
       
-      if (cursorRef.current && cursorDotRef.current) {
+      if (cursorRef.current && cursorDotRef.current && gsap) {
         gsap.to(cursorRef.current, {
           x: e.clientX,
           y: e.clientY,
@@ -136,9 +153,12 @@ export default function Portfolio() {
     }
   }, [gsap, isLoading])
 
-  // GSAP Animations
+  // GSAP Animations (mobile-safe)
   useEffect(() => {
     if (!gsap || !ScrollTrigger || isLoading) return
+
+    // Detect mobile for simplified animations
+    const isMobile = window.innerWidth < 768
 
     // Sync Lenis with GSAP ScrollTrigger
     if (lenis) {
@@ -148,15 +168,15 @@ export default function Portfolio() {
     // Hero section animations
     gsap.from('.hero-avatar', {
       scale: 0,
-      rotation: 360,
-      duration: 1,
+      rotation: isMobile ? 180 : 360,
+      duration: isMobile ? 0.8 : 1,
       ease: 'back.out(1.7)',
       delay: 0.2
     })
 
-    // Continuous floating animation for avatar
+    // Continuous floating animation for avatar (reduced on mobile)
     gsap.to('.hero-avatar', {
-      y: -15,
+      y: isMobile ? -8 : -15,
       duration: 2,
       repeat: -1,
       yoyo: true,
@@ -192,36 +212,38 @@ export default function Portfolio() {
       delay: 1.1
     })
 
-    // Floating shapes animation
-    gsap.to('.animate-float-slow', {
-      y: '-=20',
-      x: '-=10',
-      rotation: 5,
-      duration: 3,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut'
-    })
+    // Floating shapes animation (reduced on mobile)
+    if (!isMobile) {
+      gsap.to('.animate-float-slow', {
+        y: '-=20',
+        x: '-=10',
+        rotation: 5,
+        duration: 3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      })
 
-    gsap.to('.animate-float-medium', {
-      y: '-=30',
-      x: '+=15',
-      rotation: -8,
-      duration: 2.5,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut'
-    })
+      gsap.to('.animate-float-medium', {
+        y: '-=30',
+        x: '+=15',
+        rotation: -8,
+        duration: 2.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      })
 
-    gsap.to('.animate-float-fast', {
-      y: '-=40',
-      x: '-=20',
-      rotation: 10,
-      duration: 2,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut'
-    })
+      gsap.to('.animate-float-fast', {
+        y: '-=40',
+        x: '-=20',
+        rotation: 10,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      })
+    }
 
     // Skills cards animation with ScrollTrigger and floating
     gsap.utils.toArray('.skill-card').forEach((card: any, index) => {
@@ -508,6 +530,7 @@ export default function Portfolio() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    playClickSound()
     setIsSending(true)
 
     try {
@@ -764,8 +787,8 @@ export default function Portfolio() {
         }}
       />
 
-      {/* Floating geometric objects throughout the page */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      {/* Floating geometric objects throughout the page - Hidden on mobile for performance */}
+      <div className="hidden md:block fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Top section - Large objects with varied animations */}
         <div className="absolute top-5 left-5 w-32 h-32 bg-purple-300/20 dark:bg-purple-500/20 rounded-full animate-float-spiral parallax-slow"></div>
         <div className="absolute top-10 right-10 w-28 h-28 bg-blue-300/20 dark:bg-blue-500/20 rounded-full animate-float-wave parallax-medium"></div>
@@ -907,7 +930,10 @@ export default function Portfolio() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={() => {
+                  playClickSound()
+                  setIsMenuOpen(!isMenuOpen)
+                }}
                 className="w-9 h-9 rounded-full"
               >
                 {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -919,19 +945,19 @@ export default function Portfolio() {
           {isMenuOpen && (
             <div className="md:hidden mt-4 pb-4">
               <div className="flex flex-col gap-4">
-                <a href="#about" className="hover:text-purple-600 transition-colors">
+                <a href="#about" className="hover:text-purple-600 transition-colors" onClick={playClickSound}>
                   About
                 </a>
-                <a href="#skills" className="hover:text-purple-600 transition-colors">
+                <a href="#skills" className="hover:text-purple-600 transition-colors" onClick={playClickSound}>
                   Skills
                 </a>
-                <a href="#resume" className="hover:text-purple-600 transition-colors">
+                <a href="#resume" className="hover:text-purple-600 transition-colors" onClick={playClickSound}>
                   Resume
                 </a>
-                <a href="#projects" className="hover:text-purple-600 transition-colors">
+                <a href="#projects" className="hover:text-purple-600 transition-colors" onClick={playClickSound}>
                   Projects
                 </a>
-                <a href="#contact" className="hover:text-purple-600 transition-colors">
+                <a href="#contact" className="hover:text-purple-600 transition-colors" onClick={playClickSound}>
                   Contact
                 </a>
               </div>
@@ -969,6 +995,7 @@ export default function Portfolio() {
                 variant="outline" 
                 size="lg"
                 onClick={() => {
+                  playClickSound()
                   // Create a download link for the resume
                   const link = document.createElement('a');
                   link.href = '/resume-ayush-kumar-sao.pdf';
@@ -1277,6 +1304,7 @@ export default function Portfolio() {
               size="lg" 
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               onClick={() => {
+                playClickSound()
                 const link = document.createElement('a');
                 link.href = '/resume-ayush-kumar-sao.pdf';
                 link.download = 'Ayush_Kumar_Sao_Resume.pdf';

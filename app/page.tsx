@@ -778,11 +778,11 @@ export default function Portfolio() {
       />
 
       {/* Floating geometric objects throughout the page */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-10 overflow-hidden">
         {/* Top section - Large objects with varied animations */}
-        <div className="absolute top-5 left-5 w-32 h-32 bg-purple-300/20 dark:bg-purple-500/20 rounded-full animate-float-spiral parallax-slow"></div>
-        <div className="absolute top-10 right-10 w-28 h-28 bg-blue-300/20 dark:bg-blue-500/20 rounded-full animate-float-wave parallax-medium"></div>
-        <div className="absolute top-20 left-1/4 w-24 h-24 bg-emerald-300/20 dark:bg-emerald-500/20 rounded-full animate-float-bounce parallax-fast"></div>
+        <div className="absolute top-5 left-5 w-32 h-32 bg-purple-300/30 dark:bg-purple-500/30 rounded-full animate-float-spiral parallax-slow"></div>
+        <div className="absolute top-10 right-10 w-28 h-28 bg-blue-300/30 dark:bg-blue-500/30 rounded-full animate-float-wave parallax-medium"></div>
+        <div className="absolute top-20 left-1/4 w-24 h-24 bg-emerald-300/30 dark:bg-emerald-500/30 rounded-full animate-float-bounce parallax-fast"></div>
         <div className="absolute top-32 right-1/4 w-20 h-20 bg-pink-300/20 dark:bg-pink-500/20 transform rotate-45 animate-float-zigzag parallax-slow"></div>
         <div className="absolute top-16 left-1/3 w-26 h-26 bg-indigo-300/20 dark:bg-indigo-500/20 rounded-full animate-float-slow parallax-medium"></div>
         <div className="absolute top-40 right-1/3 w-22 h-22 bg-cyan-300/20 dark:bg-cyan-500/20 transform rotate-45 animate-float-medium parallax-fast"></div>

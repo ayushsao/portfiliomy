@@ -105,13 +105,8 @@ export default function Portfolio() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Custom cursor effect (desktop only)
+  // Custom cursor effect
   useEffect(() => {
-    // Check if device is mobile/tablet
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768
-    
-    if (isMobile) return // Skip cursor on mobile
-
     const handleMouseMove = (e: MouseEvent) => {
       setCursorPosition({ x: e.clientX, y: e.clientY })
       
@@ -153,12 +148,9 @@ export default function Portfolio() {
     }
   }, [gsap, isLoading])
 
-  // GSAP Animations (mobile-safe)
+  // GSAP Animations
   useEffect(() => {
     if (!gsap || !ScrollTrigger || isLoading) return
-
-    // Detect mobile for simplified animations
-    const isMobile = window.innerWidth < 768
 
     // Sync Lenis with GSAP ScrollTrigger
     if (lenis) {
@@ -168,15 +160,15 @@ export default function Portfolio() {
     // Hero section animations
     gsap.from('.hero-avatar', {
       scale: 0,
-      rotation: isMobile ? 180 : 360,
-      duration: isMobile ? 0.8 : 1,
+      rotation: 360,
+      duration: 1,
       ease: 'back.out(1.7)',
       delay: 0.2
     })
 
-    // Continuous floating animation for avatar (reduced on mobile)
+    // Continuous floating animation for avatar
     gsap.to('.hero-avatar', {
-      y: isMobile ? -8 : -15,
+      y: -15,
       duration: 2,
       repeat: -1,
       yoyo: true,
@@ -212,38 +204,36 @@ export default function Portfolio() {
       delay: 1.1
     })
 
-    // Floating shapes animation (reduced on mobile)
-    if (!isMobile) {
-      gsap.to('.animate-float-slow', {
-        y: '-=20',
-        x: '-=10',
-        rotation: 5,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      })
+    // Floating shapes animation
+    gsap.to('.animate-float-slow', {
+      y: '-=20',
+      x: '-=10',
+      rotation: 5,
+      duration: 3,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    })
 
-      gsap.to('.animate-float-medium', {
-        y: '-=30',
-        x: '+=15',
-        rotation: -8,
-        duration: 2.5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      })
+    gsap.to('.animate-float-medium', {
+      y: '-=30',
+      x: '+=15',
+      rotation: -8,
+      duration: 2.5,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    })
 
-      gsap.to('.animate-float-fast', {
-        y: '-=40',
-        x: '-=20',
-        rotation: 10,
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      })
-    }
+    gsap.to('.animate-float-fast', {
+      y: '-=40',
+      x: '-=20',
+      rotation: 10,
+      duration: 2,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    })
 
     // Skills cards animation with ScrollTrigger and floating
     gsap.utils.toArray('.skill-card').forEach((card: any, index) => {
@@ -787,8 +777,8 @@ export default function Portfolio() {
         }}
       />
 
-      {/* Floating geometric objects throughout the page - Hidden on mobile for performance */}
-      <div className="hidden md:block fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      {/* Floating geometric objects throughout the page */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Top section - Large objects with varied animations */}
         <div className="absolute top-5 left-5 w-32 h-32 bg-purple-300/20 dark:bg-purple-500/20 rounded-full animate-float-spiral parallax-slow"></div>
         <div className="absolute top-10 right-10 w-28 h-28 bg-blue-300/20 dark:bg-blue-500/20 rounded-full animate-float-wave parallax-medium"></div>

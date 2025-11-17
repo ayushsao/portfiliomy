@@ -77,16 +77,16 @@ export default function Portfolio() {
       description: "AI-powered essay evaluator with real-time grammar scoring and analytical feedback. Achieved 95% evaluation accuracy and improved assessment efficiency for users.",
       image: "/edunova-preview1.png",
       tags: ["Next.js", "Tailwind CSS", "Firebase"],
-      github: "#",
-      demo: "#",
+      github: "https://github.com/ayushsao",
+      demo: "https://portfiliomy.vercel.app",
     },
     {
       title: "Cryptora",
       description: "Real-time cryptocurrency tracker using CoinGecko API and Chart.js. Optimized Redux state management, reducing chart rendering time by 15%.",
       image: "/cryptora-preview.jpg",
       tags: ["React.js", "Redux", "Chart.js"],
-      github: "#",
-      demo: "#",
+      github: "https://github.com/ayushsao",
+      demo: "https://portfiliomy.vercel.app",
     },
   ]
 
@@ -236,7 +236,7 @@ export default function Portfolio() {
     })
 
     // Skills cards animation with ScrollTrigger and floating
-    gsap.utils.toArray('.skill-card').forEach((card: any, index) => {
+    gsap.utils.toArray('.skill-card').forEach((card: any, index: number) => {
       gsap.from(card, {
         scrollTrigger: {
           trigger: card,
@@ -276,7 +276,7 @@ export default function Portfolio() {
     })
 
     // Projects animation with floating
-    gsap.utils.toArray('.project-card').forEach((card: any, index) => {
+    gsap.utils.toArray('.project-card').forEach((card: any, index: number) => {
       gsap.from(card, {
         scrollTrigger: {
           trigger: card,
@@ -380,7 +380,7 @@ export default function Portfolio() {
     })
 
     // Floating badges
-    gsap.utils.toArray('.badge, [class*="badge"]').forEach((badge: any, index) => {
+    gsap.utils.toArray('.badge, [class*="badge"]').forEach((badge: any, index: number) => {
       gsap.to(badge, {
         y: -4,
         duration: 1.8 + (index % 3) * 0.2,
@@ -392,7 +392,7 @@ export default function Portfolio() {
     })
 
     // Floating cards in general
-    gsap.utils.toArray('[class*="Card"], .card').forEach((card: any, index) => {
+    gsap.utils.toArray('[class*="Card"], .card').forEach((card: any, index: number) => {
       gsap.to(card, {
         y: -6,
         duration: 2.2 + (index % 4) * 0.3,
@@ -404,7 +404,7 @@ export default function Portfolio() {
     })
 
     // Resume section cards floating
-    gsap.utils.toArray('#resume .card, #resume [class*="Card"]').forEach((card: any, index) => {
+    gsap.utils.toArray('#resume .card, #resume [class*="Card"]').forEach((card: any, index: number) => {
       gsap.to(card, {
         y: -8,
         duration: 2.4 + (index % 3) * 0.4,
@@ -426,7 +426,7 @@ export default function Portfolio() {
     })
 
     // Footer elements floating
-    gsap.utils.toArray('footer a, footer .icon, footer svg').forEach((elem: any, index) => {
+    gsap.utils.toArray('footer a, footer .icon, footer svg').forEach((elem: any, index: number) => {
       gsap.to(elem, {
         y: -4,
         duration: 2 + (index % 5) * 0.3,
@@ -438,7 +438,7 @@ export default function Portfolio() {
     })
 
     // Footer sections floating
-    gsap.utils.toArray('footer > div > div, footer .grid > div').forEach((section: any, index) => {
+    gsap.utils.toArray('footer > div > div, footer .grid > div').forEach((section: any, index: number) => {
       gsap.to(section, {
         y: -6,
         duration: 2.8 + (index % 2) * 0.4,
@@ -450,7 +450,7 @@ export default function Portfolio() {
     })
 
     // Achievement/certification cards floating
-    gsap.utils.toArray('#resume .grid > div').forEach((achievement: any, index) => {
+    gsap.utils.toArray('#resume .grid > div').forEach((achievement: any, index: number) => {
       gsap.to(achievement, {
         y: -7,
         duration: 2.3 + (index % 4) * 0.3,
@@ -462,7 +462,7 @@ export default function Portfolio() {
     })
 
     // Social media icons floating
-    gsap.utils.toArray('.social-icon, a[href*="github"], a[href*="linkedin"], a[href*="twitter"], a[href*="mail"]').forEach((icon: any, index) => {
+    gsap.utils.toArray('.social-icon, a[href*="github"], a[href*="linkedin"], a[href*="twitter"], a[href*="mail"]').forEach((icon: any, index: number) => {
       gsap.to(icon, {
         y: -5,
         scale: 1.05,
@@ -475,7 +475,7 @@ export default function Portfolio() {
     })
 
     // Images floating effect
-    gsap.utils.toArray('img').forEach((img: any, index) => {
+    gsap.utils.toArray('img').forEach((img: any, index: number) => {
       gsap.to(img, {
         y: -8,
         duration: 2.5 + (index % 3) * 0.4,
@@ -487,7 +487,7 @@ export default function Portfolio() {
     })
 
     // Input fields subtle floating
-    gsap.utils.toArray('input, textarea, select').forEach((input: any, index) => {
+    gsap.utils.toArray('input, textarea, select').forEach((input: any, index: number) => {
       gsap.to(input, {
         y: -3,
         duration: 2.2,
@@ -967,28 +967,36 @@ export default function Portfolio() {
                 className="w-full h-full object-cover"
               />
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+            <h1 className="font-poppins text-4xl sm:text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
               {fullName}
             </h1>
-            <p className="text-xl md:text-2xl text-slate-700 dark:text-slate-300 mb-8 font-medium">
+            <p className="font-grotesk text-xl md:text-2xl text-slate-700 dark:text-slate-300 mb-8 font-medium">
               Software Developer | C++ • JavaScript • React
             </p>
             <p className="text-base md:text-lg text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
               Building scalable web applications and solving complex problems. Top 0.4% on LeetCode with a 500-day streak. Currently seeking opportunities in product engineering.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 min-w-[180px]"
+                onClick={() => {
+                  playClickSound()
+                  document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+              >
                 View My Work
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button 
                 variant="outline" 
                 size="lg"
+                className="min-w-[180px]"
                 onClick={() => {
                   playClickSound()
                   // Create a download link for the resume
                   const link = document.createElement('a');
-                  link.href = '/resume-ayush-kumar-sao.pdf';
+                  link.href = '/Resume-ayush-kumar-sao.pdf';
                   link.download = 'Ayush_Kumar_Sao_Resume.pdf';
                   document.body.appendChild(link);
                   link.click();
@@ -1296,7 +1304,7 @@ export default function Portfolio() {
               onClick={() => {
                 playClickSound()
                 const link = document.createElement('a');
-                link.href = '/resume-ayush-kumar-sao.pdf';
+                link.href = '/Resume-ayush-kumar-sao.pdf';
                 link.download = 'Ayush_Kumar_Sao_Resume.pdf';
                 document.body.appendChild(link);
                 link.click();
